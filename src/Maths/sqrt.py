@@ -1,5 +1,5 @@
 from math import sqrt as sqroot
-from src.LinAlg.matrix import ndarray,Matrix
+from src.LinAlg import ndarray,Matrix
 
 def sqrt(x):
     if isinstance(x,ndarray):

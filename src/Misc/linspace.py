@@ -1,4 +1,4 @@
-from src.LinAlg.matrix import Vector
+from src.LinAlg.ndarray import Vector
 
 def linspace(a, b, n:int=100):
     if n < 2:

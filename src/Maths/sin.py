@@ -1,5 +1,5 @@
 from math import sin as sine
-from src.LinAlg.matrix import ndarray,Matrix
+from src.LinAlg import ndarray,Matrix
 
 def sin(x):
     if isinstance(x,ndarray):

@@ -1,4 +1,5 @@
-from src.LinAlg.matrix import ndarray,Matrix,Vector
+from src.LinAlg.ndarray import ndarray
+from src.LinAlg.ndarray import Matrix,Vector
 
 def svd(A:Matrix) -> list[Matrix,Matrix,Matrix]:
 

@@ -1,5 +1,5 @@
 from math import acosh as archyperbcos
-from src.LinAlg.matrix import ndarray,Matrix
+from src.LinAlg import ndarray,Matrix
 
 def acosh(x):
     if isinstance(x,ndarray):

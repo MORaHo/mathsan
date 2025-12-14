@@ -1,5 +1,5 @@
 import sys
-from src.LinAlg.matrix import ndarray,Matrix,Vector
+from src.LinAlg.ndarray import ndarray,Matrix,Vector
 
 ## This is element wise multiplication for matrices, which is useful when using methods which require lambda functions which can take vectors but require only element wise multiplcation
 ## This is an equivalent to .* in matlab, and I have called ew for element-wise multiplication, and since the solution is ugly it makes it easier to remember the name

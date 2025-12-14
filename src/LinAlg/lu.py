@@ -1,4 +1,4 @@
-from src.LinAlg.matrix import Matrix
+from src.LinAlg.ndarray import Matrix
 from src.LinAlg.utils import eye,zeros,copy
 import sys
 

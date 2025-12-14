@@ -1,5 +1,5 @@
 from math import tan as tangent
-from src.LinAlg.matrix import ndarray,Matrix
+from src.LinAlg import ndarray,Matrix
 
 def tan(x):
     if isinstance(x,ndarray):

@@ -1,4 +1,4 @@
-from src.LinAlg.matrix import ndarray,Matrix
+from src.LinAlg import ndarray,Matrix
 
 def absol(x):
     if isinstance(x,ndarray):

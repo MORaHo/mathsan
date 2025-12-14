@@ -1,4 +1,4 @@
-from src.LinAlg.matrix import Matrix
+from src.LinAlg.ndarray import Matrix
 from src.LinAlg.chol import chol
 
 def spd(A:Matrix):

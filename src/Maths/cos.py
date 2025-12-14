@@ -1,5 +1,5 @@
 from math import cos as cosine
-from src.LinAlg.matrix import ndarray,Matrix,Vector
+from src.LinAlg import ndarray,Matrix
 
 def cos(x):
     if isinstance(x,ndarray):

@@ -1,9 +1,10 @@
 import sys
 from typing import Union
-from src.LinAlg.matrix import ndarray,Matrix,Vector
+from src.LinAlg.ndarray import ndarray
+from src.LinAlg.ndarray import Matrix,Vector
 
 numbers = Union[int,float,complex]
-toll = 2e-8
+toll = 2E-8
 
 def eye(n:int):
     I = [ [ 1 if i == j else 0 for j in range(n) ] for i in range(n) ]
@@ -19,14 +20,14 @@ def zeros(m:int,n:int=1):
 
 def copy(A:ndarray):
     [Arows,Acols] = A.size()
-    N = [[ A[j][i] for i in range(Acols)] for j in range(Arows)]
+    N = [[ A.matrix[j][i] for i in range(Acols)] for j in range(Arows)]
     return Matrix(N)
 
 def diag(A:ndarray,offset_:int=0):
 
     [Arows,Acols] = A.size()
 
-    if Arows == 1 or Acols == 1: # matrix is a vector so we create a matrix
+    if type(A) == Vector: # matrix is a vector so we create a matrix
 
         shift_y = (offset_ < 0)
         shift_x = (offset_ > 0)
@@ -35,7 +36,7 @@ def diag(A:ndarray,offset_:int=0):
         column = (Arows>1) #allows use to handle both column and row vectors
         row = (Acols>1)
 
-        dim = Arows*(Arows>1) + Acols*(Acols>1) + abs(offset_)
+        dim = len(A)*abs(offset_)
         B = zeros(dim,dim)
 
         for i in range(dim):
@@ -46,7 +47,7 @@ def diag(A:ndarray,offset_:int=0):
                     A_j = shift_x*column*j + shift_y*column*i + zero_case*column*j
                     A_i = shift_y*row*i + shift_x*row*j + zero_case*row*i
 
-                    B[j][i] = A[A_j][A_i]
+                    B[j][i] = A.matrix[A_j][A_i]
         return B
                     
 
@@ -97,7 +98,7 @@ def ndabs(A:ndarray): #absolute value for ndarrays
     [Mrows,Mcols] = M.size()
     for j in range(Mrows):
         for i in range(Mcols):
-            M[j][i] = abs(M[j][i])
+            M[j][i] = abs(M.matrix[j][i])
     return M
 
 def isequal(A:ndarray,B:ndarray):
@@ -113,6 +114,6 @@ def isequal(A:ndarray,B:ndarray):
 
     for j in range(m):
         for i in range(n):
-            if abs(A[j][i] - B[j][i]) > toll:
+            if abs(A.matrix[j][i] - B.matrix[j][i]) > toll:
                 return False
     return True

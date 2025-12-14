@@ -7,7 +7,7 @@ from src.LinAlg.hess_to_triang import triag
 from src.LinAlg.hilbert import hilbert
 from src.LinAlg.inv import inv
 from src.LinAlg.lu import lu
-from src.LinAlg.matrix import ndarray,Matrix,Vector
+from src.LinAlg.ndarray import ndarray,Matrix,Vector
 from src.LinAlg.meg import meg
 from src.LinAlg.norm import norm
 from src.LinAlg.power import power, inv_power

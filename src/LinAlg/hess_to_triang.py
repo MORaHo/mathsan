@@ -1,7 +1,6 @@
-from src.LinAlg.qr import qr
 from src.LinAlg.utils import eye
 from src.LinAlg.givens import givens
-from src.LinAlg.matrix import Matrix,Vector
+from src.LinAlg.ndarray import Matrix
 
 toll = 2e-16 #tolerance we'll be using for power methods
 nmax = 250 #maximum number of iterations 

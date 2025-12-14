@@ -1,6 +1,5 @@
-
 from math import floor as flooring
-from src.LinAlg.matrix import ndarray,Matrix
+from src.LinAlg import ndarray,Matrix
 
 def floor(x):
     if isinstance(x,ndarray):

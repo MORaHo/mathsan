@@ -1,5 +1,5 @@
 from math import log as logarithm
-from src.LinAlg.matrix import ndarray,Matrix,Vector
+from src.LinAlg.ndarray import ndarray,Matrix,Vector
 
 def ln(x,base):
     return logarithm(x)

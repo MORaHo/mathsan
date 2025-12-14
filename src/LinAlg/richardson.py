@@ -1,5 +1,5 @@
 import sys
-from src.LinAlg.matrix import Matrix,Vector
+from src.LinAlg.ndarray import Matrix,Vector
 from src.LinAlg.norm import norm
 from src.LinAlg.solve import solve
 from src.LinAlg.utils import eye

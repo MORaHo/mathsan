@@ -1,5 +1,5 @@
 from math import asinh as archyperbsine
-from src.LinAlg.matrix import ndarray,Matrix
+from src.LinAlg import ndarray,Matrix
 
 def asinh(x):
     if isinstance(x,ndarray):

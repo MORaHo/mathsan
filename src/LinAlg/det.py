@@ -1,4 +1,4 @@
-from src.LinAlg.matrix import Matrix
+from src.LinAlg.ndarray import Matrix
 from src.LinAlg.lu import lu
 
 def det(A:Matrix):

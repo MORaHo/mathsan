@@ -1,4 +1,4 @@
-from src.LinAlg.matrix import Vector
+from src.LinAlg.ndarray import Vector
 from src.Maths import cos
 from math import pi
 

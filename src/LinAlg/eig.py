@@ -1,4 +1,4 @@
-from src.LinAlg.matrix import Matrix,Vector
+from src.LinAlg.ndarray import Matrix,Vector
 from src.LinAlg.utils import diag,ndabs
 from src.LinAlg.qr import qr
 
@@ -16,8 +16,8 @@ def eig(A:Matrix):
         Q *= Q_k
         A_k = R_k*Q_k #iteration of A_k to make it into a upper triangular matrix with the eigen values on the primary diagonal
         p = diag(A_k)
-        pp1 = ndabs(Vector(p[1:len(p)]))
-        p = ndabs(Vector(p[0:len(p)-1]))
+        pp1 = ndabs(p[1:len(p)])
+        p = ndabs(p[0:len(p)-1])
         pm1 = diag(A_k,-1)
         n = 0
         for i in range(len(pm1)):

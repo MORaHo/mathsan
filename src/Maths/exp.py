@@ -1,5 +1,5 @@
 from math import exp as exponential
-from src.LinAlg.matrix import ndarray,Vector,Matrix
+from src.LinAlg import ndarray,Matrix
 
 def exp(x):
     if isinstance(x,ndarray):

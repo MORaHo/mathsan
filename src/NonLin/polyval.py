@@ -1,8 +1,5 @@
-from src.Maths.sin import sin
 from src.LinAlg.utils import zeros
-from src.LinAlg.matrix import Vector
-from src.Misc.linspace import linspace
-from src.NonLin.polyfit import polyfit
+from src.LinAlg.ndarray import Vector
 
 def polyval(p:Vector,xeval:Vector):
 
@@ -12,7 +9,7 @@ def polyval(p:Vector,xeval:Vector):
     xeval = zeros(x)
     for i in range(x):
         for j in range(n):
-            xeval[i][0] += p[n-j-1][0] * xinit[i][0]**j
+            xeval[i][0] += p[n-j-1] * xinit[i]**j
 
     return xeval
 

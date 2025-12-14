@@ -1,4 +1,5 @@
-from src.LinAlg.matrix import ndarray,Matrix,Vector
+from src.LinAlg.ndarray import ndarray
+from src.LinAlg.ndarray import Matrix,Vector
 from typing import Union
 numbers = Union[int,float,complex]
 from src.LinAlg.utils import copy
@@ -18,7 +19,7 @@ def norm(M:ndarray,type_ = 2) -> numbers: #this will be changes to 2 when the sp
                 for i in range(Acols):
                     sum = 0
                     for j in range(Arows):
-                        sum += abs(A[j][i])
+                        sum += abs(A.matrix[j][i])
                     if sum > norm:
                         norm = sum
                 return norm
@@ -28,7 +29,7 @@ def norm(M:ndarray,type_ = 2) -> numbers: #this will be changes to 2 when the sp
                 for j in range(Arows):
                     sum = 0
                     for i in range(Acols):
-                        sum += abs(A[j][i])
+                        sum += abs(A.matrix[j][i])
                     if sum > norm:
                         norm = sum
                 return norm
@@ -36,9 +37,8 @@ def norm(M:ndarray,type_ = 2) -> numbers: #this will be changes to 2 when the sp
             case 2: #Eucledian, 2 will be reserved for what will be the spectral norm or there will be a distinction between vector and matrix normss
                 
                 norm = 0
-                for j in range(Arows):
-                    for i in range(Acols):
-                        norm += A[j][i]**2
+                for j in range(len(A)):
+                    norm += A[j]**2
                 
                 return sqrt(norm)
             

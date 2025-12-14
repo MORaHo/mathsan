@@ -1,5 +1,5 @@
 from math import cosh as hyperbcos
-from src.LinAlg.matrix import ndarray,Matrix
+from src.LinAlg import ndarray,Matrix
 
 def cosh(x):
     if isinstance(x,ndarray):

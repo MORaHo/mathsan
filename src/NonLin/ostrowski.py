@@ -1,5 +1,5 @@
 import sys
-from src.LinAlg.matrix import Vector
+from src.LinAlg.ndarray import Vector
 
 def ostrowski(x0:int,nmax:int,toll,f,df,mol:int):
 

@@ -1,6 +1,4 @@
-from src.LinAlg import vand,solve,matrix
-from src.Maths import log
-Vector = matrix.Vector
+from src.LinAlg import vand,solve,Vector
 
 ## See algorithm section: https://uk.mathworks.com/help/matlab/ref/polyfit.html
 

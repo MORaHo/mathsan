@@ -1,5 +1,5 @@
 from math import ceil as ceiling
-from src.LinAlg.matrix import ndarray,Matrix
+from src.LinAlg import ndarray,Matrix
 
 def ceil(x):
     if isinstance(x,ndarray):

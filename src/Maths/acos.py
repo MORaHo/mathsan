@@ -1,5 +1,5 @@
 from math import acos as arccos
-from src.LinAlg.matrix import ndarray,Matrix
+from src.LinAlg import ndarray,Matrix
 
 def acos(x):
     if isinstance(x,ndarray):

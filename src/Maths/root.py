@@ -1,4 +1,4 @@
-from src.LinAlg.matrix import ndarray,Matrix
+from src.LinAlg import ndarray,Matrix
 
 def root(x,n:int):
     if isinstance(x,ndarray):

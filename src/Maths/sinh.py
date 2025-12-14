@@ -1,5 +1,5 @@
 from math import sinh as hyperbsine
-from src.LinAlg.matrix import ndarray,Matrix
+from src.LinAlg import ndarray,Matrix
 
 def sinh(x):
     if isinstance(x,ndarray):

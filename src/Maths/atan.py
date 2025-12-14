@@ -1,5 +1,5 @@
 from math import atan as arctangent
-from src.LinAlg.matrix import ndarray,Matrix
+from src.LinAlg import ndarray,Matrix
 
 def atan(x):
     if isinstance(x,ndarray):

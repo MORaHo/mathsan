@@ -1,5 +1,5 @@
 from math import tanh as hyperbtan
-from src.LinAlg.matrix import ndarray,Matrix
+from src.LinAlg import ndarray,Matrix
 
 def tanh(x):
     if isinstance(x,ndarray):

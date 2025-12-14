@@ -1,4 +1,4 @@
-from src.LinAlg.matrix import Matrix,Vector
+from src.LinAlg.ndarray import Matrix,Vector
 from src.LinAlg.utils import ones
 from src.LinAlg.inv import inv
 from math import sqrt
@@ -9,7 +9,7 @@ nmax = 250 #maximum number of iterations
 def norm(v:Vector):
     norm = 0
     for j in range(len(v)):
-        norm += v[j][0]**2
+        norm += v[j]**2
 
     return sqrt(norm)
 
@@ -43,3 +43,6 @@ def mineig(A:Matrix):
 
 power = power_method = maxeig
 inv_power = inverse_power_method = inv_power_method = mineig
+
+#A = Matrix([[1,1,0],[1,0,1],[0,1,1]])
+#print(power(A)[0])

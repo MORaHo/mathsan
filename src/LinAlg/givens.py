@@ -1,6 +1,5 @@
 from math import sqrt
 from src.LinAlg.utils import eye
-from src.LinAlg.matrix import Matrix
 
 # https://en.wikipedia.org/wiki/Givens_rotation
 

@@ -2,7 +2,7 @@ from src.NonLin.bisection import bisection
 from src.NonLin.fixed_point import fixed_point
 from src.NonLin.integrate import integrate
 from src.NonLin.midpoint import midpoint
-from mathsan.src.NonLin.newtonsys import newtonsys
+from src.NonLin.newtonsys import newtonsys
 from src.NonLin.newton import newton
 from src.NonLin.ostrowski import ostrowski
 from src.NonLin.polyfit import polyfit

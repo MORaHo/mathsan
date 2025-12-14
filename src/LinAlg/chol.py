@@ -1,6 +1,6 @@
-from src.LinAlg.matrix import Matrix
 from math import sqrt
 from src.LinAlg.utils import copy
+from src.LinAlg.ndarray import Matrix
 
 def chol(A:Matrix):
     [m,_] = A.size()
