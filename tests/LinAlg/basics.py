@@ -1,5 +1,5 @@
 from src.LinAlg.utils import isequal
-from src.LinAlg.matrix import Matrix,Vector,ndarray
+from src.LinAlg.ndarray import Matrix,Vector
 
 ### This file implements tests to see if all the functionalities in LinAlg.matrix function or not, since without them nothing else will work
 
@@ -80,7 +80,6 @@ tests_passed += 1
 E = Matrix([[1,2,3],[4,5,6]])
 
 try:
-    print("If the next message is 'Matrix dimensions of types don't match (Addition)', that is what should happen")
     E + D
     #if this works as it should "Matrix dimensions or types don't match", which is what should happen as they do not effectively match
     alert("Sum method not working, adding matrices of different sizes!")
@@ -140,3 +139,5 @@ y = Vector([1,1,1,1,1],is_row=1)
 
 if not isequal(x.row(),y) or not isequal(y.col(),x):
     alert("Row or column methods not working!")
+
+print("All tests passed!")

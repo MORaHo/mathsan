@@ -1,5 +1,5 @@
 from src.LinAlg.utils import isequal
-from src.LinAlg.matrix import Matrix
+from src.LinAlg.ndarray import Matrix
 from src.LinAlg.qr import qr_householder as qr
 
 A = Matrix([[12,-51,4],[6,167,-68],[-4,24,-41]])
