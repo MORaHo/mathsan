@@ -485,7 +485,7 @@ class Vector(ndarray):
     def __mul__(self,v):
         
         if type(v) in numbers.__args__: #allows element wise moltiplication by scalar with the matrix
-            Z = Vector([ v*self[j] for j in range()],is_row=self.is_row)
+            Z = Vector([ v*self[j] for j in range(len(self))],is_row=self.is_row)
             return Vector(Z)
 
         [rows,columns] = self.size()
