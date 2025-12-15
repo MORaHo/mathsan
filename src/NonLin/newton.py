@@ -29,17 +29,16 @@ def newton(x0:int,nmax:int,toll,f,df,mol:int):
     while it < nmax and err > toll:
         dfx = df(xv)
         if dfx == 0:
-            print('Stop due to annulment of df');
+            print('Stop due to annulment of df')
             sys.exit()
-        else:
-            xn = xv - mol*f(xv)/dfx
-            err = abs(xn-xv)
-            xvect.append(xn)
-            it = it+1
-            xv = xn
+        xn = xv - mol*f(xv)/dfx
+        err = abs(xn-xv)
+        xvect.append(xn)
+        it = it+1
+        xv = xn
 
     if (it < nmax):
-        print(' Converged in',it,'iterations');
+        print(' Converged in',it,'iterations')
     else:
         print('Iteration limit reached')
     print('Calculated root: ',xvect[-1])
