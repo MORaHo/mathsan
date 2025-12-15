@@ -6,24 +6,24 @@ from src.LinAlg.ndarray import Matrix,Vector
 numbers = Union[int,float,complex]
 toll = 2E-8
 
-def eye(n:int):
+def eye(n:int) -> (Vector | Matrix):
     I = [ [ 1 if i == j else 0 for j in range(n) ] for i in range(n) ]
     return Matrix(I)
 
-def ones(m:int,n:int=1):
+def ones(m:int,n:int=1) -> (Vector | Matrix):
     Z = [ [ 1 for _ in range(n) ] for _ in range(m) ]
     return Matrix(Z)
 
-def zeros(m:int,n:int=1):
+def zeros(m:int,n:int=1) -> (Vector | Matrix):
     Z = [ [ 0 for _ in range(n) ] for _ in range(m) ]
     return Matrix(Z)
 
-def copy(A:ndarray):
+def copy(A:ndarray)-> Matrix:
     [Arows,Acols] = A.size()
     N = [[ A.matrix[j][i] for i in range(Acols)] for j in range(Arows)]
     return Matrix(N)
 
-def diag(A:ndarray,offset_:int=0):
+def diag(A:ndarray,offset_:int=0) -> (Vector | Matrix):
 
     [Arows,Acols] = A.size()
 
@@ -69,7 +69,7 @@ def diag(A:ndarray,offset_:int=0):
         print("Matrix is not vector or square matrix")
         sys.exit()
 
-def tril(A:Matrix):
+def tril(A:Matrix) -> Matrix:
     n,m = A.size() # m = Arows and n = Acols, to avoid rewriting a lot
     M = zeros(n,m)
     for i in range(n):
@@ -78,7 +78,7 @@ def tril(A:Matrix):
                 M[i][j] = A[i][j]
     return M
 
-def triu(A:Matrix):
+def triu(A:Matrix) -> Matrix:
     n,m = A.size() # m = Arows and n = Acols, to avoid rewriting a lot
     M = zeros(n,m)
     for i in range(n):
@@ -87,11 +87,11 @@ def triu(A:Matrix):
                 M[i][j] = A[i][j]
     return M
 
-def linspace(a, b, n:int=100):
+def linspace(a, b, n:int=100) -> Vector:
     if n < 2:
         return b
     diff = (float(b) - a)/(n - 1)
-    return [a + diff*i  for i in range(n)]
+    return Vector([a + diff*i  for i in range(n)])
 
 def ndabs(A:ndarray): #absolute value for ndarrays
     M = copy(A)
