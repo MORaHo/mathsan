@@ -1,4 +1,4 @@
-from math import cosh as hyperbcos
+from cmath import cosh as hyperbcos
 from src.LinAlg import ndarray,Matrix
 
 def cosh(x):

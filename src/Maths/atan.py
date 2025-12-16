@@ -1,4 +1,4 @@
-from math import atan as arctangent
+from cmath import atan as arctangent
 from src.LinAlg import ndarray,Matrix
 
 def atan(x):

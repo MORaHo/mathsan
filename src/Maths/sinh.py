@@ -1,4 +1,4 @@
-from math import sinh as hyperbsine
+from cmath import sinh as hyperbsine
 from src.LinAlg import ndarray,Matrix
 
 def sinh(x):

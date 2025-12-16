@@ -1,4 +1,4 @@
-from math import acosh as archyperbcos
+from cmath import acosh as archyperbcos
 from src.LinAlg import ndarray,Matrix
 
 def acosh(x):

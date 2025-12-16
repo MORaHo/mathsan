@@ -1,4 +1,4 @@
-from math import sqrt as sqroot
+from cmath import sqrt as sqroot
 from src.LinAlg import ndarray,Matrix
 
 def sqrt(x):

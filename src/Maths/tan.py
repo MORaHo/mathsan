@@ -1,4 +1,4 @@
-from math import tan as tangent
+from cmath import tan as tangent
 from src.LinAlg import ndarray,Matrix
 
 def tan(x):

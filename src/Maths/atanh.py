@@ -1,4 +1,4 @@
-from math import atanh as archyperbtan
+from cmath import atanh as archyperbtan
 from src.LinAlg import ndarray,Matrix
 
 def atanh(x):

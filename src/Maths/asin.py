@@ -1,4 +1,4 @@
-from math import asin as arcsine
+from cmath import asin as arcsine
 from src.LinAlg import ndarray,Matrix
 
 def asin(x):

@@ -1,4 +1,4 @@
-from math import tanh as hyperbtan
+from cmath import tanh as hyperbtan
 from src.LinAlg import ndarray,Matrix
 
 def tanh(x):

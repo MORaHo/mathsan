@@ -42,4 +42,4 @@ def newton(x0:int,nmax:int,toll,f,df,mol:int):
     else:
         print('Iteration limit reached')
     print('Calculated root: ',xvect[-1])
-    return [Vector(xvect),it]
+    return [xn,it]

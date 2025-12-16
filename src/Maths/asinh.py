@@ -1,4 +1,4 @@
-from math import asinh as archyperbsine
+from cmath import asinh as archyperbsine
 from src.LinAlg import ndarray,Matrix
 
 def asinh(x):

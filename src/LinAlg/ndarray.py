@@ -47,9 +47,19 @@ class ndarray():
         for j in range(len(self.matrix)):
             string += "  "
             for i in range(len(self.matrix[0])):
-                number = format(float(self.matrix[j][i]),'.4')
-                string += str(number)
-                string += "  "
+                entry = self.matrix[j][i]
+                if type(entry) == complex:
+                    real = format(float(self.matrix[j][i].real),'.3')
+                    cmplx = format(float(self.matrix[j][i].imag),'.3')
+                    string += str(real)
+                    string += "+"
+                    string += str(cmplx)
+                    string += "j"
+                    string += "  "
+                else:
+                    number = format(float(self.matrix[j][i]),'.4')
+                    string += str(number)
+                    string += "  "
             string += ("\n" + (j<len(self.matrix)-1)*"\n")
         return string
     

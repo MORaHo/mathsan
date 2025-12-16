@@ -1,4 +1,4 @@
-from math import exp as exponential
+from cmath import exp as exponential
 from src.LinAlg import ndarray,Matrix
 
 def exp(x):

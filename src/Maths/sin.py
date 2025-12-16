@@ -1,4 +1,4 @@
-from math import sin as sine
+from cmath import sin as sine
 from src.LinAlg import ndarray,Matrix
 
 def sin(x):

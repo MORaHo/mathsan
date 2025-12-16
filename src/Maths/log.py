@@ -1,4 +1,4 @@
-from math import log as logarithm
+from cmath import log as logarithm
 from src.LinAlg.ndarray import ndarray,Matrix,Vector
 
 def ln(x,base):
@@ -21,4 +21,4 @@ def log(x:Vector,base:int=0):
                 M.append(logarithm(x[j][i],base))
         return Matrix(M,rows,cols)
     else:
-        return logarithm(x[j][i],base)
+        return logarithm(x,base)

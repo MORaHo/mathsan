@@ -1,4 +1,4 @@
-from math import acos as arccos
+from cmath import acos as arccos
 from src.LinAlg import ndarray,Matrix
 
 def acos(x):

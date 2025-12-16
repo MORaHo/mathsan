@@ -1,4 +1,4 @@
-from math import cos as cosine
+from cmath import cos as cosine
 from src.LinAlg import ndarray,Matrix
 
 def cos(x):
