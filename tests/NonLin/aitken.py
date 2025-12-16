@@ -9,7 +9,6 @@ phi1 = lambda x: (exp(x)+x)/(exp(x)+1)
 
 results0 = aitken(phi0,x0=2,toll=1E-10)
 results1 = aitken(phi1,x0=2,toll=1E-10)
-
 expected0 = [1+0j,10]
 expected1 = [1+0j,4]
 
