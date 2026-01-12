@@ -7,121 +7,329 @@ numbers = Union[int, float, complex]
 #| NDARRAY CLASS |#
 ##---------------##
 
+COLUMN_MAJOR = 0
+ROW_MAJOR = 1
+
+
+## Functions used in __str__ to convert from i to an index to print the intended matrix entry
+row_str_lambda = lambda i,rows,columns: i
+col_str_lambda = lambda i,rows,columns: (i%columns)*rows+(i//columns)
 
 class ndarray:
-    def __init__(self, data, rows: int, columns: int):
-        try:
-            if type(data[0]) == list:
-                data_size = len(data) * len(data[0])
-            else:
-                data_size = len(data)
 
-            if data_size != rows * columns:
-                print("Data doesn't fit in the size parameters.")
-                sys.exit()
+    def __init__(self, data, size:list[int]=[],major:int=ROW_MAJOR,transpose_flag:bool=False,preserve_flag:bool=False):
 
-            if type(data) == list and type(data[0]) == list:# if the input data is already a 2d array
+        """
+            data: Is the list of data entries which will be the base for our array, which we will have to parse to clear needs
+            size: List of given dimensions for the array, if it empty we look at the shape of the given data, and if the data is of type list[int], we consider it a vector
+            major: Direction in which we store data (row major order or column major order), different orientations have their distinct advantages
+            preserve_flag: Logical flag to make sure data is not accidentaly transposed, indicates whether the data already follows the major which is indicated.
+        """
+
+        if type(data) in numbers.__args__:
+            self.matrix = [data]
+            self.size = [1,1]
+
+        if len(size) != 0: #we don't check type since size has been declared so the data will either match what is given in size or it is of type list[int]
+
+            element = data[0]
+            data_depth = 1
+
+            while type(element) not in numbers.__args__:
+                data_depth += 1
+                element = element[0]
+
+            if data_depth > 2 or len(size) > 2:
+                raise Exception("Arrays with dimension greater than 2, currently not supported!")
+
+            if data_depth > 1 and len(size) != data_depth:
+                raise Exception("Data input size not equal to size input!")
+
+            data_size = 1
+            for s in size:
+                data_size *= s
+
+            if data_depth == 1 and data_size != len(data):
+                raise Exception("Data input entry not equal to input size dimension!")
+            elif data_depth == 2 and data_size != len(data)*len(data[0]):
+                raise Exception("Data input entry not equal to input size dimension!")
+
+            if data_depth == 1:
                 self.matrix = data
+                if len(size) == 1:
+                    self.matrix = data
+                    self.size = [1,size[0]] #default to row vector
+                else:
+                    if transpose_flag is False: #If a column major order is called for, we organize data in such a manner. preserve_flag tells us if the vectorialized data is already
+                        # ordered as the major is indicating.
+                        if major == ROW_MAJOR or preserve_flag is True:
+                            self.matrix == data
+                        else: #because we default to believing it's a row major
+                            [rows,columns] = size
+                            self.matrix = []
+                            for i in range(len(data)): #this can probably be collapsed inside the self.matrix declaration, but keeping for now for legibility.
+                                row = i%rows
+                                column = i//rows
+                                entry = row*columns+column
+                                self.matrix.append(data[entry])
+                    elif transpose_flag is True:
+                        if preserve_flag == True:
+                            [rows,columns] = size
+                            self.matrix = []
+                            for i in range(len(data)): #this can probably be collapsed inside the self.matrix declaration, but keeping for now for legibility.
+                                row = i%columns
+                                column = i//columns
+                                entry = row*rows+column
+                                self.matrix.append(data[entry])
+                            size = size[::-1]
+                        else:
+                            self.matrix = data
+                            size = size[::-1]
+                    self.size = size
+
+
+                if self.size[0] != 1 and self.size[1] == 1: #if the size indicates that it is a column vector, change the default setting
+                    major = COLUMN_MAJOR
+                elif self.size[0] == 1 and self.size[1] != 1:
+                    major = ROW_MAJOR
+
+            elif data_depth == 2:
+                if major == COLUMN_MAJOR: #We don't need preserve_flag here because Python matrices are already naturally row ordered, so independent of that
+                    # we will have to convert it to column major ordered.
+                    self.matrix = []
+                    for i in range(len(data[0])):
+                        for j in range(len(data)):
+                            self.matrix.append(data[j][i])
+                else:
+                    self.matrix = []
+                    for i in range(len(data[0])):
+                        for j in range(len(data)):
+                            self.matrix.append(data[j][i])
+                self.size = size
+            else: #this is currenly not supported so it is just here to take space and add a not
+                # To be able to vectorizalise tensors of larger dimensions that one, I will need to recursively iterate through
+                # the data, but since I am currently limiting myself to vectors and matricies, this will currently be left unused.
+                pass
+
+        elif len(size) == 0: #in this case the data is either pre-formatted or it will be treated as a vector so we already know that is of type list[int]
+
+            # we don't use preserve_flag at any point here, because how vectors are stored doesn't change based on order direction, and input of type list[list]
+            # will only be external, so all internal operations will be treated by the above code.
+
+            if type(data[0]) is int: #it's a vector
+                if major: #if it's a row vector (default)
+                    self.size = [1,len(data)]
+                else:
+                    self.size = [len(data),1]
+                self.matrix = data
+
             else:
-                self.matrix = [
-                    data[r * columns : r * columns + columns] for r in range(rows)
-                ]
-        except:
+                size = [len(data),len(data[0])]
+                element = data[0][0]
+                while type(element) not in numbers.__args__:
+                    size.append(len(element))
+                    element = element[0]
+
+                if len(size) > 2:
+                    raise Exception("Matrices with dimension greater than 2 are currently not able to be generated!")
+                if major != ROW_MAJOR: #generate a column-major ordered flattened array
+                    self.matrix = []
+                    [_,columns] = size
+                    for i in range(len(data)):
+                        row = i//columns
+                        column = i % columns
+                        self.matrix.append(data[row][column])
+                else:
+                    self.matrix = []
+                    for i in range(len(data)):
+                        self.matrix += data[i]
+                self.size = size
+
+        else:
             self.matrix = []
+            self.size = [0,0]
+            print("Notice: Whether intentional or due to error, empty matrix has been generated!")
+
+        self.major = major
+
+    def len(self):
+        return len(self.matrix)
 
     def T(self):  # returns matrix transpose
-        T = [[self[j][i] for j in range(len(self))] for i in range(len(self[0]))]
-        return ndarray(T, rows=len(self[0]), columns=len(self))
+        major = COLUMN_MAJOR * int(self.major == ROW_MAJOR) + ROW_MAJOR * int(self.major != ROW_MAJOR)
+        return Matrix(data=self.matrix,size=self.size,major=major,transpose_flag = True,preserve_flag = False)
+        # preserve_flag is false, since the __init__ does not know that we are transposing that data, so when we go to do another operation like __add__
+        # and the array which we are inputting has self.major = COLUMN_MAJOR, and we want to keep this, __init__ will not know that the data is already in
+        # column major order (since by default we are treating all matrices as row major ordered) and will unintentially transpose the data, so preserve_flag
+        # is there to prevent this behaviour.
 
     def H(self):  # complex conjugate equivalent of the tranpose
-        M = self.matrix
-        H = [ [ conj(M[j][i]) if type(M[j][i]) == complex else M[j][i] for j in range(len(M)) ] for i in range(len(M[0])) ]
-        return ndarray(H, len(H), len(H[0]))
+        major = COLUMN_MAJOR * int(self.major == ROW_MAJOR) + ROW_MAJOR * int(self.major != ROW_MAJOR)
+        H = [ conj(self.matrix[j]) if type(self.matrix[j]) is complex else self.matrix[j] for j in range(self.len()) ]
+        return Matrix(H,size=self.size,major=major,transpose_flag = True, preserve_flag = False)
 
     def __str__(self):
         """Prints matrix in Matlab style, although the variable name is not printed"""
         string = "\n"
-
-        for j in range(len(self.matrix)):
+        [rows,columns] = self.size
+        if self.major == ROW_MAJOR:
+            str_function = row_str_lambda
+        else:
+            str_function = col_str_lambda
+        for i in range(self.len()):
             string += "  "
-            for i in range(len(self.matrix[0])):
-                entry = self.matrix[j][i]
-                if type(entry) == complex:
-                    real = format(float(self.matrix[j][i].real), ".3")
-                    cmplx = format(float(self.matrix[j][i].imag), ".3")
-                    string += str(real)
-                    string += "+"
-                    string += str(cmplx)
-                    string += "j"
-                    string += "  "
-                else:
-                    number = format(float(self.matrix[j][i]),'.4')
-                    string += str(number)
-                    string += "  "
-            string += "\n" + (j < len(self.matrix) - 1) * "\n"
+            index = str_function(i,rows,columns)
+            entry = self.matrix[index]
+            if type(entry) is complex:
+                real = format(float(entry.real), ".3")
+                cmplx = format(float(entry.imag), ".3")
+                string += str(real)
+                string += "+"
+                string += str(cmplx)
+                string += "j"
+                string += "  "
+            else:
+                number = format(float(entry),'.4')
+                string += str(number)
+                string += "  "
+            if (i+1)%(columns)==0 and i>0:
+                string += "\n"
         return string
 
     def __len__(self):
         return len(self.matrix)
 
     def __getitem__(self, index):
-        if type(index) == int:
-            return self.matrix[index]
 
-        elif type(index) == slice:
-            return self.matrix[index]
+        [rows,columns] = self.size
 
-        try:
-            if type(index) == tuple and len(index) == 2:
-                y, x = index
+        if self.major == ROW_MAJOR:
+            if type(index) is int:
+                return self.matrix[columns*index:columns*(index+1)]
 
-                if type(y) == slice:
-                    y_start = int(0 if y.start == None else y.start)
-                    y_end = int(len(self) if y.stop == None else y.stop)
-                elif type(y) == int:
-                    y_start = y
-                    y_end = y + 1
-                if type(x) == slice:
-                    x_start = int(0 if x.start == None else x.start)
-                    x_end = int(len(self[0]) if x.stop == None else x.stop)
-                elif type(x) == int:
-                    x_start = x
-                    x_end = x + 1
+            elif type(index) is slice:
+                y_start = int(0 if index.start is None else index.start)
+                y_end = int(rows if index.stop is None else index.stop)
+                return self.matrix[y_start*columns:y_end*columns]
 
-                M = [
-                    [self[j][i] for i in range(x_start, x_end)]
-                    for j in range(y_start, y_end)
-                ]
+            try:
+                if type(index) is tuple and len(index) == 2:
+                    y, x = index
 
-                if [len(M), len(M[0])] != [1, 1]:
-                    return ndarray(M)
-                else:
-                    return M[0][0]
+                    if type(y) is slice:
+                        y_start = int(0 if y.start is None else y.start)
+                        y_end = int(rows if y.stop is None else y.stop)
+                    elif type(y) is int:
+                        y_start = y
+                        y_end = y + 1
+                    if type(x) is slice:
+                        x_start = int(0 if x.start is None else x.start)
+                        x_end = int(columns if x.stop is None else x.stop)
+                    elif type(x) is int:
+                        x_start = x
+                        x_end = x + 1
 
-        except:
-            return []
+                    M = [ self.matrix[j*columns+x_start:j*columns+x_end] for j in range(y_start, y_end) ]
 
-    def __add__(self, B):  # addition
-        if type(self) == type(B) and len(self) == len(B) and len(self[0]) == len(B[0]):
-            C = [
-                [self[i][j] + B[i][j] for j in range(len(B[0]))] for i in range(len(B))
-            ]
-            return ndarray(C)
-        else:
-            print("Matrix dimensions or types don't match! (Addition)")
-            sys.exit()
+                    rows = y_end-y_start
+                    cols = x_end-x_start
 
-    def __sub__(self, s):  # subdivision
-        if type(self) != type(s) or len(self) != len(s) or len(self[0]) != len(s[0]):
-            print("Matrix dimensions or types do not match! (Subtraction)")
-            sys.exit()
+                    if [rows, cols] != [1, 1]:
 
-        S = [[0 for _ in range(len(self[0]))] for _ in range(len(self))]
-        for i in range(len(self)):
-            for j in range(len(self[0])):
-                S[i][j] = self[i][j] - s[i][j]
+                        return Matrix(M,size=[rows,cols],major=self.major,preserve_flag=True)
+                    else:
+                        return M[0][0]
 
-        return ndarray(S)
+            except:
+                return []
+
+        else: #column ordered array, returns
+            if type(index) is int:
+                return self.matrix[index:columns*rows+index:rows]
+
+            elif type(index) is slice:
+                y_start = int(0 if index.start is None else index.start)
+                y_end = int(rows if index.stop is None else index.stop)
+                return [self.matrix[i:(columns-1)*rows+i:rows] for i in range(y_start,y_end)]
+
+            try:
+                if type(index) is tuple and len(index) == 2:
+                    y, x = index
+
+                    if type(y) is slice:
+                        y_start = int(0 if y.start is None else y.start)
+                        y_end = int(rows if y.stop is None else y.stop)
+                    elif type(y) is int:
+                        y_start = y
+                        y_end = y + 1
+                    if type(x) is slice:
+                        x_start = int(0 if x.start is None else x.start)
+                        x_end = int(columns if x.stop is None else x.stop)
+                    elif type(x) is int:
+                        x_start = x
+                        x_end = x + 1
+                    M = [ self.matrix[ x_start*rows+i:x_end*rows+i:rows ] for i in range(y_start, y_end) ]
+
+                    if [len(M), len(M[0])] != [1, 1]:
+                        return Matrix(M,major=self.major,preserve_flag=True)
+                    else:
+                        return M[0][0]
+
+            except:
+                return []
+
+
+    def __add__(self, item):  #This function is a candidate for parallelizations since no operation is dependent on other operations.
+
+        if type(self) is not type(item) or self.size != item.size:
+            raise Exception("Matrix dimensions or types don't match for addition!")
+
+        C = []
+        [rows,columns] = self.size
+
+        selfrowstep = columns*int(self.major == ROW_MAJOR) + 1*int(self.major != ROW_MAJOR)
+        selfcolstep = 1*int(self.major == ROW_MAJOR) + rows*int(self.major != ROW_MAJOR)
+        itemrowstep = columns*int(item.major == ROW_MAJOR) + 1*int(item.major != ROW_MAJOR)
+        itemcolstep = 1*int(item.major == ROW_MAJOR) + rows*int(item.major != ROW_MAJOR)
+
+        for i in range(len(self.matrix)):
+            row = i // columns
+            column = i % columns
+
+            k = row * selfrowstep + column * selfcolstep
+            j = itemrowstep * row + itemcolstep * column
+
+            C.append(self.matrix[k] + item.matrix[j])
+
+        return Matrix(data=C,size=self.size,major=self.major,preserve_flag=True)
+
+    def __sub__(self, item):  # subdivision
+
+        if type(self) is not type(item) or self.size != item.size:
+            raise Exception("Matrix dimensions or types don't match for addition!")
+
+        C = []
+        [rows,columns] = self.size
+
+        selfrowstep = columns*int(self.major == ROW_MAJOR) + 1*int(self.major != ROW_MAJOR)
+        selfcolstep = 1*int(self.major == ROW_MAJOR) + rows*int(self.major != ROW_MAJOR)
+        itemrowstep = columns*int(item.major == ROW_MAJOR) + 1*int(item.major != ROW_MAJOR)
+        itemcolstep = 1*int(item.major == ROW_MAJOR) + rows*int(item.major != ROW_MAJOR)
+
+        for i in range(len(self.matrix)):
+            row = i // columns
+            column = i % columns
+
+            k = row * selfrowstep + column * selfcolstep
+            j = itemrowstep * row + itemcolstep * column
+
+            C.append(self.matrix[k] - item.matrix[j])
+
+        return Matrix(data=C,size=self.size,major=self.major,preserve_flag=True)
+
+    def __truediv__(self, s):  # element-wise division
+        S = [self.matrix[i] / s for i in range(len(self.matrix))]
+        return Matrix(S,size=self.size,major=self.major,preserve_flag=True)
 
 ##--------------##
 #| MATRIX CLASS |#
@@ -129,239 +337,275 @@ class ndarray:
 
 class Matrix(ndarray):
 
-    def __new__(cls, data, rows: int = 0, columns: int = 0):
+    def __new__(cls, data, size:list[int] = [0,0],major:int=ROW_MAJOR,transpose_flag:bool=False,preserve_flag:bool=False):
+        [rows,columns] = size
         if rows < 2 or columns < 2:
             if columns == 0 and len(data) == 1:  # it's a row
-                return Vector(data, is_row=1)
+                return Vector(data,axis=ROW_MAJOR)
             try:
                 if len(data[0]) == 1:
-                    return Vector(data)
+                    return Vector(data,axis=COLUMN_MAJOR)
                 else:
                     return super(Matrix, cls).__new__(cls)
             except:
-                return Vector(data)
+                return Vector(data,axis=COLUMN_MAJOR)
 
         else:
             return super(Matrix, cls).__new__(cls)
 
-    def __init__(self, data, rows: int = 0, columns: int = 0):
+    def __init__(self, data,size:list[int]=[0,0] , major:int=ROW_MAJOR , transpose_flag:bool=False , preserve_flag:bool=False):
+        [rows,columns] = size
         rows = rows * (rows != 0) + len(data) * (rows == 0)
         try:
             columns = columns * (columns != 0) + len(data[0]) * (columns == 0)
         except:
             columns = columns
-        super().__init__(data=data, rows=rows, columns=columns)
+        size = [rows,columns]
+        if type(data) is list and type(data[0]) is list:
+            size = []
+        super().__init__(data=data,size=size,major=major,transpose_flag=transpose_flag,preserve_flag=preserve_flag)
 
-    def T(self):  # returns matrix transpose
-        T = [[self[j][i] for j in range(len(self))] for i in range(len(self[0]))]
-        return Matrix(T, rows=len(self[0]), columns=len(self))
-
-    def H(self):  # complex conjugate equivalent of the tranpose
-        M = self.matrix
-        H = [[ conj(M[j][i]) if type(M[j][i]) == complex else M[j][i] for j in range(len(M)) ] for i in range(len(M[0])) ]
-        return Matrix(H, len(H), len(H[0]))
-
-    def __getitem__(self, index):
-        if type(index) == int:
-            return self.matrix[index]
-
-        elif type(index) == slice:
-            return self.matrix[index]
-
-        try:
-            if type(index) == tuple and len(index) == 2:
-                y, x = index
-
-                if type(y) == slice:
-                    y_start = int(0 if y.start == None else y.start)
-                    y_end = int(len(self) if y.stop == None else y.stop)
-                elif type(y) == int:
-                    y_start = y
-                    y_end = y + 1
-                if type(x) == slice:
-                    x_start = int(0 if x.start == None else x.start)
-                    x_end = int(len(self[0]) if x.stop == None else x.stop)
-                elif type(x) == int:
-                    x_start = x
-                    x_end = x + 1
-
-                M = [
-                    [self[j][i] for i in range(x_start, x_end)]
-                    for j in range(y_start, y_end)
-                ]
-
-                if [len(M), len(M[0])] != [1, 1]:
-                    return Matrix(M)
-                else:
-                    return M[0][0]
-
-        except:
-            return []
 
     def __setitem__(self, index, item):
-        if type(index) == tuple and len(index) == 2:
+
+        [rows,cols] = self.size
+        if type(index) is tuple and len(index) == 2:
             y, x = index
 
-            if type(item) == Matrix:
-                i_n, i_m = item.size()
+            if type(item) is Matrix:
 
-                if type(y) == slice and type(x) == slice:
-                    y_start = int(0 if y.start == None else y.start)
-                    y_end = int(len(self.matrix) if y.stop == None else y.stop)
-                    x_start = int(0 if x.start == None else x.start)
-                    x_end = int(len(self.matrix[0]) if x.stop == None else x.stop)
+                item_rows, item_columns = item.size
 
-                    if i_n != (y_end - y_start) or i_m != (x_end - x_start):
-                        raise Exception(
-                            "Item change dimensions do not match, check the what you are trying to change (matrix input case)"
-                        )
+                if type(y) is slice and type(x) is slice:
+                    y_start = int(0 if y.start is None else y.start)
+                    y_end = int(rows if y.stop is None else y.stop)
+                    x_start = int(0 if x.start is None else x.start)
+                    x_end = int(cols if x.stop is None else x.stop)
 
-                    for j in range(y_start, y_end):
-                        for i in range(x_start, x_end):
-                            self[j][i] = item[j - y_start][i - x_start]
+                    [rows,cols] = self.size
 
-                if type(y) == slice and type(x) == int:
-                    y_start = int(0 if y.start == None else y.start)
-                    y_end = int(len(self) if y.stop == None else y.stop)
+                    if item_columns != x_end-x_start or item_rows != y_end-y_start:
+                        raise Exception("Input error: Input dimensions do not match slice area!")
 
-                    if i_n != (y_end - y_start):
-                        raise Exception(
-                            "Item change dimensions do not match, check the what you are trying to change (column vector case)"
-                        )
+                    if y_end > rows or x_end > cols or x_start < 0 or y_start < 0:
+                        raise Exception("Input error: Slice bounds outside of matrix")
 
-                    for j in range(y_start, y_end):
-                        self[j][x] = item[j - y_start][x]
 
-                elif type(y) == int and type(x) == slice:
-                    x_start = int(0 if x.start == None else x.start)
-                    x_end = int(len(self[0]) if x.stop == None else x.stop)
+                    itemdenom = 1*int(item.major == ROW_MAJOR) + item_columns*int(item.major != ROW_MAJOR)
+                    itemstep = 1*int(item.major == ROW_MAJOR) + item_rows*int(item.major != ROW_MAJOR)
+                    offsetstepy = cols*int(self.major == ROW_MAJOR) + 1*int(self.major != ROW_MAJOR)
+                    offsetstepx = 1*int(self.major == ROW_MAJOR) + rows*int(self.major != ROW_MAJOR)
 
-                    if i_n != (x_end - x_start):
-                        raise Exception(
-                            "Item change dimensions do not match, check the what you are trying to change (row vector case)"
-                        )
+                    itemsize = item_rows*item_columns
 
-                    for j in range(x_start, x_end):
-                        self[x][j] = item[x][j - x_start]
+                    for k in range(itemsize):
+                        itemrow = k//itemdenom
+                        itemcol = k%itemdenom
+                        itemi = itemrow + itemcol * itemstep
+                        #We first have to find the position in the matrix without the offset
+                        subrow = (k // item_columns)
+                        subcol = k % item_columns
+                        subi =  (subrow + subcol * rows)*int(self.major != ROW_MAJOR) + (subrow * rows + subcol)*int(self.major == ROW_MAJOR)
+                        # Then we can find the position in the matrix after applying the offset
+                        i = subi + y_start*offsetstepy + x_start*offsetstepx
+                        self.matrix[i] = item.matrix[itemi]
 
-            elif type(item) == Vector:
-                i_n = len(item)
-                if item.is_row:  # it's a row vector
-                    start = int(0 if x.start == None else x.start)
-                    end = int(len(self[0]) if x.stop == None else x.stop) + 1
-                    if type(y) != int:
-                        raise Exception(
-                            "Item dimensions too large, it is row vector, so cannot span multipe rows"
-                        )
+
+            elif type(item) is Vector:
+
+                [rows,columns] = self.size
+
+                item_length = len(item)
+
+                if item.major == ROW_MAJOR:  # it's a row vector
+                    start = int(0 if x.start is None else x.start)
+                    end = int(columns if x.stop is None else x.stop)
+                    if type(y) is not int:
+                        raise Exception("Item dimensions too large, it is row vector, so cannot span multipe rows!")
                 else:
-                    start = int(0 if y.start == None else y.start)
-                    end = int(len(self) if y.stop == None else y.stop) + 1
-                    if type(x) != int:
-                        raise Exception(
-                            "Item dimensions too large, it is column vector, so cannot span multipe columns"
-                        )
+                    start = int(0 if y.start is None else y.start)
+                    end = int(rows if y.stop is None else y.stop)
+                    if type(x) is not int:
+                        raise Exception("Item dimensions too large, it is column vector, so cannot span multipe columns!")
 
-                if i_n != (end - start):
-                    raise Exception(
-                        "Item change dimensions do not match, check the what you are trying to change"
-                    )
+                if item_length != (end - start):
+                    raise Exception("Input vector and given dimensions do not match, check the what you are trying to change!")
 
-                if item.is_row:  # again, row vector
-                    for j in range(start, end):
-                        self[y][j] = item[j - start]
+                if item.major == ROW_MAJOR:  # again, row vector
+                    col = cols*int(self.major == ROW_MAJOR) + 1*int(self.major != ROW_MAJOR)
+                    row = 1*int(self.major == ROW_MAJOR) + rows*int(self.major != ROW_MAJOR)
+                    step = 1*int(self.major == ROW_MAJOR) + rows*int(self.major != ROW_MAJOR)
+                    shift = y * col + start * row
                 else:
-                    for j in range(start, end):
-                        self[j][x] = item[j - start]
+                    col = 1*int(self.major == ROW_MAJOR) + rows*int(self.major != ROW_MAJOR)
+                    row = cols*int(self.major == ROW_MAJOR) + 1*int(self.major != ROW_MAJOR)
+                    step = cols*int(self.major == ROW_MAJOR) + 1*int(self.major != ROW_MAJOR)
+                    shift = x * col + start * row
+                for i in range(len(item)):
+                    k = step * i + shift
+                    self.matrix[k] = item.matrix[i]
 
             elif type(item) in numbers.__args__:
-                if type(x) != int or type(y) != int:
-                    raise Exception("Input size does not match")
 
-                self.matrix[y][x] = item
+                if type(x) is not int or type(y) is not int:
+                    raise Exception("Input size does not match, input is int,float or complex, so slice dimensions should be 1 and 1!")
+                [rows,columns] = self.size
+                row_step = cols*int(self.major == ROW_MAJOR) + 1*int(self.major != ROW_MAJOR)
+                col_step = 1*int(self.major == ROW_MAJOR) + rows*int(self.major != ROW_MAJOR)
+                self.matrix[y*row_step+x*col_step] = item
+        elif type(index) is slice:
+
+            if isinstance(item, ndarray):
+
+                [rows,cols] = self.size
+                [itemrows,itemcols] = item.size
+                start = index.start
+                end = index.stop
+                if itemcols != cols or itemrows != end-start:
+                    raise Exception("Number of columns in input does not match matrix columns!")
+
+                denom = 1*int(self.major == ROW_MAJOR) + cols*int(self.major != ROW_MAJOR)
+                step = 1*int(self.major == ROW_MAJOR) + rows*int(self.major != ROW_MAJOR)
+                itemdenom = 1*int(item.major == ROW_MAJOR) + itemcols*int(item.major != ROW_MAJOR)
+                itemstep = 1*int(item.major == ROW_MAJOR) + itemrows*int(item.major != ROW_MAJOR)
+                offsetstep = cols*int(self.major == ROW_MAJOR) + 1*int(self.major != ROW_MAJOR)
+
+                itemsize = itemrows*itemcols
+                for k in range(itemsize):
+                    itemcol = k%itemdenom
+                    itemrow = k//itemdenom
+                    itemi = itemrow + itemcol * itemstep
+                    row = k % denom
+                    col = k // denom
+                    i = col + (row) * step + start*offsetstep
+                    self.matrix[i] = item.matrix[itemi]
+
+            elif type(item) is list and type(item[0]) is list:
+
+                [rows,cols] = self.size
+                [itemrows,itemcols] = [len(item),len(item[0])]
+                start = index.start
+                end = index.stop
+
+                if itemcols != cols or itemrows != end-start:
+                    raise Exception("Number of columns in input does not match matrix columns!")
+
+                denom = 1*int(self.major == ROW_MAJOR) + cols*int(self.major != ROW_MAJOR)
+                step = 1*int(self.major == ROW_MAJOR) + rows*int(self.major != ROW_MAJOR)
+                offsetstep = cols*int(self.major == ROW_MAJOR) + 1*int(self.major != ROW_MAJOR)
+
+                itemsize = itemrows*itemcols
+                for k in range(itemsize):
+                    itemrow = k//itemcols
+                    itemcol = k%itemcols
+                    row = k // denom
+                    col = k % denom
+                    i = row + (col) * step + start*offsetstep
+                    self.matrix[i] = item[itemrow][itemcol]
+
+            else:
+                start = index.start
+                end = index.stop
+                raise Exception("Input error: For setting into slice, input must have same dimensions are area sliced! In this case: "+str(end-start)+" x "+str(self.size[1]))
+        elif type(index) is int:
+            if type(item) is not list and type(item) is not Vector:
+                raise Exception("Input should be a list or vector")
+            if type(item) is Vector and item.major != ROW_MAJOR:
+                raise Exception("Input should be row vector, currently not!")
+            [rows,columns] = self.size
+            if len(item) != columns:
+                raise Exception("Dimension does not match number of columns in matrix!")
+            step = 1*int(self.major == ROW_MAJOR) + rows*int(self.major != ROW_MAJOR)
+            row = columns*int(self.major == ROW_MAJOR) + 1*int(self.major != ROW_MAJOR)
+            if type(item) is list:
+                for i in range(columns):
+                    k = index*row + i*step
+                    self.matrix[k] = item[i]
+            elif type(item) is Vector:
+                for i in range(columns):
+                    k = index*row + i*step
+                    self.matrix[k] = item.matrix[i]
         else:
-            self.matrix[index] = item
+            if type(item) is not list or len(item) is not len(self[index]):
+                raise Exception("Input size does not match required size by matrix!")
+            self[index] = item
 
-    def __add__(self, B):  # addition
-        if type(self) == type(B) and B.size() == self.size():
-            C = [[self[i][j] + B[i][j] for j in range(len(B[0]))] for i in range(len(B))]
-            return Matrix(C)
-        else:
-            raise Exception("Matrix dimensions or types don't match! (Addition)")
+    def __mul__(self, item):  # element-wise scalar multiplication and dot product
+        [rows, columns] = self.size  # rows,columns
 
-    def __sub__(self, s):  # subdivision
-        if type(s) != Matrix or self.size() != s.size():
-            raise Exception("Matrix dimensions or types do not match! (Subtraction)")
+        if type(item) in numbers.__args__:# allows element wise moltiplication by scalar with the matrix
+            Z = [item * self.matrix[j] for j in range(len(self.matrix))]
 
-        [rows, columns] = self.size()
-        S = Matrix([[0 for _ in range(columns)] for _ in range(rows)])
+            return Matrix(Z,size=self.size,major=self.major,preserve_flag = True)
 
-        for i in range(rows):
-            for j in range(columns):
-                S[i][j] = self[i][j] - s[i][j]
-        return S
-
-    def __mul__(self, B):  # element-wise scalar multiplication and dot product
-        [rows, columns] = self.size()  # rows,columns
-
-        if type(B) in numbers.__args__:# allows element wise moltiplication by scalar with the matrix
-            Z = [[B * self[j, i] for i in range(columns)] for j in range(rows)]
-
-            return Matrix(Z)
-
-        elif columns != B.size()[0]:# if the dimensions don't match the dotproduct cannot be performed
+        elif columns != item.size[0]:# if the dimensions don't match the dotproduct cannot be performed
             raise Exception("Dimensions of the two matrices don't match")
 
-        new_columns = B.size()[1]
-        Z = Matrix([[0 for _ in range(new_columns)] for _ in range(rows)])
+        [item_rows,item_columns] = item.size
+        Z = []
 
-        # dot-product
-        for i in range(new_columns):
-            for j in range(rows):
-                sum = 0
-                for k in range(columns):
-                    sum += self[j, k] * B.matrix[k][i]
-                Z[j, i] = sum
+        rowstep = columns*int(self.major == ROW_MAJOR) + 1*int(self.major != ROW_MAJOR)
+        colstep = 1*int(item.major == ROW_MAJOR) + item_rows*int(item.major != ROW_MAJOR)
+        j_selfstep = 1*int(self.major == ROW_MAJOR) + rows*int(self.major != ROW_MAJOR)
+        j_itemstep = item_columns*int(item.major == ROW_MAJOR) + 1*int(item.major != ROW_MAJOR)
 
-        if [rows, new_columns] == [1, 1]:
-            return Z[0][0]
+        for i in range(item_columns*rows):
+
+            matrow = i // item_columns #Because we are finding the row in the matrix we are generating, which has the same number of columns as the multiplicand.
+            matcol = i % item_columns
+            sum = 0
+
+            for j in range(columns): #could also be item_rows as it would be the same
+                k = matrow * rowstep + j * j_selfstep
+                itemi = matcol * colstep + j * j_itemstep
+                sum += self.matrix[k]*item.matrix[itemi]
+            Z.append(sum)
+
+        if [rows, item_columns] == [1, 1]:
+            return Z[0]
         else:
-            return Z
+            return Matrix(Z,size=[rows,item_columns],major=ROW_MAJOR)
 
     def __rmul__(self, m):
-        return self.__mul__(m)
+        if type(m) in numbers.__args__:
+            R = []
+            for i in range(len(self)):
+                R.append(m*self.matrix[i])
+            return Matrix(R,size=self.size,major = self.major, preserve_flag=True)
+        else:
+            return self.__mul__(m)
 
-    def __truediv__(self, s):  # element-wise division
-        [n, m] = self.size()
-        S = [[self[j][i] / s for i in range(m)] for j in range(n)]
-        return Matrix(S)
-
-    def __pow__(self, b):
-        if type(b) == int or type(b) == float:
-            I = []
-            [rows, cols] = self.size()
-            for j in range(rows):
-                for i in range(cols):
-                    I.append(self[j][i] ** b)
-            return Matrix(I, rows, cols)
+    def __pow__(self, item):
+        if type(item) is int or type(item) is float:
+            I = [self.matrix[i]*item for i in range(len(self.matrix))]
+            return Matrix(I, size=self.size,major=self.major,preserve_flag=True)
 
         # matmul didn't work for some reason I just chose to repurpose the power operator to permit element-wise matrix multiplication
         # this will be useful when discretizing for non-linear analysis and solving ODEs
-        elif isinstance(b, ndarray):
-            if self.size() != b.size():
-                raise Exception(
-                    "Dimensions do not match for element-wise multiplication"
-                )
+        elif isinstance(item, ndarray):
 
-            [rows, cols] = self.size()
+            if self.size != item.size:
+                raise Exception("Dimensions do not match for element-wise multiplication")
+
+            [rows, cols] = self.size
+
+            selfrowstep = cols*int(self.major == ROW_MAJOR) + 1*int(self.major != ROW_MAJOR)
+            selfcolstep = 1*int(self.major == ROW_MAJOR) + rows*int(self.major != ROW_MAJOR)
+            itemrowstep = cols*int(item.major == ROW_MAJOR) + 1*int(item.major != ROW_MAJOR)
+            itemcolstep = 1*int(item.major == ROW_MAJOR) + rows*int(item.major != ROW_MAJOR)
+
             P = []
-            for j in range(rows):
-                for i in range(cols):
-                    P.append(self[j][i] * b[j][i])
-            return Matrix(P, rows, cols)
 
-    def size(self):
-        # returns [rows,columns]
-        return [len(self), len(self[0])]
+            for i in range(len(self.matrix)):
+
+                row = i // cols
+                col = i % cols
+                k = row * selfrowstep + col * selfcolstep
+                j = row * itemrowstep + col * itemcolstep
+
+                P.append(self.matrix[k] * item.matrix[j])
+
+            return Matrix(P,size=self.size,major=ROW_MAJOR)
 
 
 ##--------------##
@@ -370,195 +614,154 @@ class Matrix(ndarray):
 
 
 class Vector(ndarray):
-    __array_priority__ = 1
 
-    def __init__(self, data, is_row: bool = False):
-        if is_row and type(data[0]) != list:
-            self.is_row = is_row
+    def __init__(self, data,axis:int=COLUMN_MAJOR,transpose_flag:bool=False,preserve_flag:bool=False):
+        if axis==ROW_MAJOR and type(data[0]) is not list:
             rows = 1
             cols = len(data)
-            super().__init__(data, rows, cols)
-        elif len(data) == 1 and type(data[0]) == list:
-            self.is_row = True
+            super().__init__(data,size=[rows,cols],major=axis,transpose_flag=transpose_flag,preserve_flag=preserve_flag)
+        elif len(data) == 1 and type(data[0]) is list:
+            axis  = ROW_MAJOR
             rows = 1
             cols = len(data[0])
-            super().__init__(data, rows, cols)
+            super().__init__(data,size=[rows,cols],major=axis,transpose_flag=transpose_flag,preserve_flag=preserve_flag)
         elif len(data) == 1:
-            self.is_row = True
+            axis  = ROW_MAJOR
             rows = 1
             cols = 1
-            super().__init__(data, rows, cols)
+            super().__init__(data,size=[rows,cols],major=axis,transpose_flag=transpose_flag,preserve_flag=preserve_flag)
         else:
-            self.is_row = False
+            axis = COLUMN_MAJOR
             rows = len(data)
             cols = 1
-            super().__init__(data, rows, cols)
+            super().__init__(data,size=[rows,cols],major=axis,transpose_flag=transpose_flag,preserve_flag=preserve_flag)
 
     def T(self):  # returns matrix transpose
-        T = [self[i] if type(self[i]) == complex else self[i] for i in range(len(self))]
-        return Vector(T, is_row=not self.is_row)
+        return Vector(self.matrix,axis=self.major,transpose_flag=True)
 
     def H(self):  # complex conjugate equivalent of the tranpose
-        H = [
-            conj(self[i]) if type(self[i]) == complex else self[i]
-            for i in range(len(self))
-        ]
-        return Vector(H, is_row=not self.is_row)
+        H = [ conj(self.matrix[j]) if type(self.matrix[j]) is complex else self.matrix[j] for j in range(self.len()) ]
+        return Vector(H,axis=self.major,transpose_flag = True)
 
     def __getitem__(self, index):
         if type(index) == int:
-            column_index = index * int(self.is_row == True) + 0 * int(
-                self.is_row != True
-            )
-            row_index = 0 * int(self.is_row == True) + index * int(self.is_row != True)
-            return self.matrix[row_index][column_index]
+            return self.matrix[index]
         elif type(index) == slice:
-            if self.is_row:
-                return Vector(self.matrix[0][index])
-            else:
-                return Vector(self.matrix[index])
+            return Vector(self.matrix[index],axis=self.major)
 
     def __setitem__(self, index, item):
-        if type(index) == tuple:
-            y, x = index
 
-            if type(item) == Vector:
-                i_n = len(item)
-                if item.is_row:  # it's a row vector
-                    start = int(0 if x.start == None else x.start)
-                    end = int(len(self[0]) if x.stop == None else x.stop) + 1
-                    if type(y) != int:
-                        raise Exception("Operation failed: Item dimensions too large, it is row vector, so cannot span multipe rows")
-                else:
-                    start = int(0 if y.start == None else y.start)
-                    end = int(len(self) if y.stop == None else y.stop) + 1
-                    if type(x) != int:
-                        raise Exception("Operation failed: Item dimensions too large, it is column vector, so cannot span multipe columns")
+        [rows,_] = self.size
 
-                if i_n != (end - start):
+        if type(index) is slice:
+
+            start = int(0 if index.start is None else index.start)
+            end = int(rows if index.stop is None else index.stop)
+
+            if type(item) is Vector or type(item) is list:
+                item_length = len(item)
+                if item_length != (end - start):
                     raise Exception("Operation failed: Item change dimensions do not match, check the what you are trying to change")
 
-                if item.is_row:  # again, row vector
-                    for j in range(start, end):
-                        self.matrix[0][j] = item[j - start]
-                else:
-                    for j in range(start, end):
-                        self.matrix[j][0] = item[j - start]
-
-            elif type(item) in numbers.__args__:
-                if type(x) != int or type(y) != int:
-                    raise Exception("Input size does not match")
-
-                self.matrix[y][x] = item
+                for j in range(start, end):
+                    self.matrix[j] = item[j - start]
 
             else:
                 raise Exception("Set operation failed: Input type is not compatible with Vector")
 
-        else:
-            if self.is_row:  # is row vector
-                self.matrix[0][index] = item
+        elif type(index) is int:
+            if type(item) is list and len(item) == 1:
+                self.matrix[index] = item[0]
+            elif type(item) not in numbers.__args__:
+                raise Exception("Set operation failed: Input has to be int,float or complex")
             else:
-                self.matrix[index][0] = item
+                self.matrix[index] = item #operation is independent of major order
 
-    def __len__(self):
-        return len(self.matrix) * int(self.is_row != True) + len(self.matrix[0]) * int(
-            self.is_row == True
-        )
+        else:
+            raise Exception("Operation failed: Index type invalid!")
+
+    def __str__(self):
+        string = "\n"
+        for i in range(self.len()):
+            string += "  "
+            entry = self.matrix[i]
+            if type(entry) is complex:
+                real = format(float(entry.real), ".3")
+                cmplx = format(float(entry.imag), ".3")
+                string += str(real)
+                string += "+"
+                string += str(cmplx)
+                string += "j"
+                string += "  "
+            else:
+                number = format(float(entry),'.4')
+                string += str(number)
+                string += " "
+            if self.major == COLUMN_MAJOR and i<len(self.matrix):
+                string += "\n"
+        return string
 
     def __add__(self, B):  # addition
-        if type(B) == Vector and len(self) == len(B) and self.is_row == B.is_row:
-            C = [self[i] + B[i] for i in range(len(B))]
-            return Vector(C, is_row=self.is_row)
-        else:
+        if type(B) is not Vector or self.size != B.size or self.major != B.major:
             raise Exception("Vector dimensions or types don't match! (Addition)")
+        return Vector([self[i] + B[i] for i in range(len(self.matrix))],axis = self.major)
 
     def __sub__(self, s):  # subdivision
-        if type(s) != Vector or self.is_row != s.is_row or len(self) != len(s):
+        if type(s) is not Vector or self.major != s.major or self.size != s.size:
             raise Exception("Vector dimensions or types do not match! (Subtraction)")
-
-        S = Vector([0 for _ in range(len(self))], is_row=self.is_row)
-        for i in range(len(self)):
-            S[i] = self[i] - s[i]
-        return S
+        return Vector([self.matrix[i]-s[i] for i in range(len(self.matrix))], axis=self.major)
 
     def __mul__(self, v):
-        if (
-            type(v) in numbers.__args__
-        ):  # allows element wise moltiplication by scalar with the matrix
-            Z = Vector([v * self[j] for j in range(len(self))], is_row=self.is_row)
-            return Vector(Z)
 
-        [rows, columns] = self.size()
+        if type(v) in numbers.__args__:  # allows element wise moltiplication by scalar with the matrix
+            return  Vector([v * self[j] for j in range(len(self.matrix))], axis=self.major)
 
-        if columns != v.size()[0]:
+        if len(self) != len(v) or self.major == v.major:
             raise Exception("Operation failed (Vector): Dimensions are not compatible to multiplication.")
 
-        new_columns = v.size()[1]
-        Z = Matrix([[0 for _ in range(new_columns)] for _ in range(rows)])
+        if self.major != ROW_MAJOR:
+            V = []
+            length = len(self)
+            for i in range(length): #using two for loops in this case I think is best since it avoids calculating mult every iteration.
+                mult = self[i]
+                for j in range(length):
+                    V.append(mult*v[j])
+            return Matrix(V,size=[length,length])
 
-        for i in range(new_columns):
-            for j in range(rows):
-                sum = 0
-                for k in range(columns):
-                    sum += self.matrix[j][k] * v.matrix[k][i]
-                Z[j, i] = sum
-
-        if [rows, new_columns] == [1, 1]:
-            return Z[0]
-        else:
-            return Z
-
-    def __truediv__(self, s):  # element-wise division
-        S = [self[i] / s for i in range(len(self))]
-        return Vector(S, is_row=self.is_row)
+        else: #only two possible cases, so insteading of writing one since operation, I wrote two
+            sum = 0
+            for i in range(len(self)):
+                sum += self[i]*v[i]
+            return sum
 
     def __pow__(self, b):
-        if type(b) == int or type(b) == float:
-            I = []
-            for j in range(len(self) - 1):
-                I.append(self[j] ** b)
-            return Vector(I, is_row=self.is_row)
+        if type(b) is int or type(b) is float:
+            I = [self.matrix[j] ** b for j in range(len(self.matrix) - 1)]
+            return Vector(I, axis=self.major)
 
         # matmul didn't work for some reason I just chose to repurpose the power operator to permit element-wise matrix multiplication
         # this will be useful when discretizing for non-linear analysis and solving ODEs
         elif isinstance(b, ndarray):
-            if self.size() != b.size():
+            if self.size != b.size or self.major != b.major:
                 raise Exception("Dimensions do not match for element-wise multiplication")
-
-            [rows, cols] = self.size()
-            P = []
-            for j in range(rows):
-                for i in range(cols):
-                    P.append(self[j][i] * b[j][i])
-            return Vector(P, self.is_row)
+            P = [self[i]*b[i] for i in range(len(self.matrix))]
+            return Vector(P, axis=self.major)
 
     def col(self):  # function to make vectors columns
-        if self.is_row:  # matrix is row vector, need to return column vector
+        if self.major == ROW_MAJOR:  # matrix is row vector, need to return column vector
             return self.T()
-        else:  # it's a column vector, no change is needed
-            return self
+        return self
 
     def row(self):  # function to make vectors columns
-        if self.is_row:  # matrix is column vector, need to return row vector
+        if self.major == ROW_MAJOR:  # matrix is column vector, need to return row vector
             return self
-        else:  # it's a row vector, no change is needed
-            return self.T()
+        return self.T()
 
     def sum(self):
-        rows = len(self)
-        s = 0
-        try:
-            for j in range(rows):
-                s += self[j]
-            return s
-        except:
-            return s
-
-    def size(self):
-        # Returns [row,colu]
-        if not self.is_row:
-            return [len(self.matrix), 1]
-        return [1, len(self.matrix[0])]
+        sum = 0
+        for i in range(len(self.matrix)):
+            sum += self.matrix[i]
+        return sum
 
 
 def conj(integer: numbers):
