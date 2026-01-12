@@ -22,39 +22,38 @@ def inv(M:Matrix):
         A[j] = A[j] + I[j]
 
     for k in range(len(A)):
-        
-        largest_value = A[k][k]
-        row = k 
+
+        largest_value = A[k,k]
+        row = k
         for i in range(k,len(M)): #finding which line to pivot with
-            if abs(A[i][k]) > abs(largest_value):
-                largest_value = A[i][k]
+            if abs(A[i,k]) > abs(largest_value):
+                largest_value = A[i,k]
                 row = i
 
         if row != k: #pivoting
             temp = A[k]
             A[k]=A[row]
             A[row]=temp
-       
-        if A[k][k] == 0: #if even with pivoting it is 0, then we move onto the next row
+
+        if A[k,k] == 0: #if even with pivoting it is 0, then we move onto the next row
             continue
 
-        A_kk = A[k][k]
+        A_kk = A[k,k]
         for j in range(len(A)):
 
             if k == j: #we don't want to nullify the matrix
                 continue
 
-            l_jk = A[j][k]/A_kk
-            A[j] = [ A[j][c]-l_jk*A[k][c] for c in range(len(A[0]))]
+            l_jk = A[j,k]/A_kk
+            A[j] = [ A[j,c]-l_jk*A[k,c] for c in range(len(A[0]))]
 
 
         for i in range(len(A[0])): #normalize all elements to make the elements on the left be ones
-            A[k][i] = A[k][i]/A_kk
+            A[k,i] = A[k,i]/A_kk
 
     end = len(A[0])
-    
-    for j in range(len(A)):
-        A[j] = [ A[j][i] for i in range(len(A),end) ]
-    
-    return A
 
+    for j in range(len(A)):
+        A[j] = [ A[j,i] for i in range(len(A),end) ]
+
+    return A

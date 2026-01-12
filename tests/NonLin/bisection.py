@@ -1,6 +1,6 @@
 from math import pi
-from src.Maths import cos
-from src.NonLin import bisection
+from src.maths.cos import cos
+from src.NonLin.bisection import bisection
 
 EPS = 1E-6
 func = lambda x: cos(x)

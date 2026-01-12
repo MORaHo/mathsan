@@ -3,12 +3,12 @@ from src.LinAlg.givens import givens
 from src.LinAlg.ndarray import Matrix
 
 toll = 2e-16 #tolerance we'll be using for power methods
-nmax = 250 #maximum number of iterations 
+nmax = 250 #maximum number of iterations
 
 # currenctly using this gives a lot of error so for now I wull substitute with a LU decomposition
 
 def triag(A:Matrix):
-    
+
     n = len(A)
     Q = eye(n)
     for i in range(0,n-1):
@@ -16,4 +16,3 @@ def triag(A:Matrix):
         Q *= G_i.T()
         A = G_i*A
     return [A,Q]
-

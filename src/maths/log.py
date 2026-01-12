@@ -12,13 +12,13 @@ def log(x:Vector,base:int=0):
         logarithm = logwithbase
     else:
         logarithm = ln
-    
+
     if isinstance(x,ndarray):
-        [rows,cols] = x.size()
+        [rows, cols] = x.size
         M = []
-        for j in range(len(x)):
-            for i in range(len(x[0])):
-                M.append(logarithm(x[j][i],base))
-        return Matrix(M,rows,cols)
+        for j in range(rows):
+            for i in range(cols):
+                M.append(logarithm(x[j,i],base))
+        return Matrix(M,size=x.size)
     else:
         return logarithm(x,base)

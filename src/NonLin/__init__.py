@@ -1,3 +1,4 @@
+"""
 from src.NonLin.bisection import bisection
 from src.NonLin.fixed_point import fixed_point
 from src.NonLin.integrate import integrate
@@ -9,3 +10,4 @@ from src.NonLin.polyfit import polyfit
 from src.NonLin.polyval import polyval
 from src.NonLin.simpson import simpson
 from src.NonLin.trapezoid import trapezoid
+"""

@@ -30,12 +30,11 @@ def richardson(A:Matrix,b:Vector,P:Matrix,x0:Vector,tol,nmax:int,alpha):
     # k: number of iterations
 
     n = len(b)
-    [Arows,Acols] = A.size()
+    [Arows,Acols] = A.size
 
     B = eye(n) - alpha * (inv(P) * A)
     if abs(power(B)[0]) > 1:
-        print("System will not converge")
-        sys.exit()
+        raise Exception("System will not converge")
 
 
     if Arows != n or Acols != n or len(x0) != n:

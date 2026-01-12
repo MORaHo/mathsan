@@ -1,5 +1,5 @@
 from src.LinAlg.ndarray import Vector
-from src.Maths import cos
+from src.maths import cos
 from math import pi
 
 # This function generates a list of nodes generated according to Chebyshev-Gauss-Lobatto

@@ -1,10 +1,10 @@
 from src.NonLin import bisection
-from src.Misc.linspace import linspace
+from src.misc.linspace import linspace
 from src.LinAlg.ndarray import Vector
 from collections.abc import Callable
 
 def fixed_point(f:Callable,nmax:int,toll:int,a,b,x0=None):
-    
+
     """
     Input Parameters:
     x0 -> Initial Guess
@@ -47,4 +47,3 @@ def fixed_point(f:Callable,nmax:int,toll:int,a,b,x0=None):
         print('Max number of iterations reaches.')
 
     return [Vector(succ),it]
-

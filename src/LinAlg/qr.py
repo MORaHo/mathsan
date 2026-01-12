@@ -10,7 +10,7 @@ def project(vec1:Vector,vec2:Vector):
     return vec2 * s
 
 def orthogonalise(A:Matrix):
-    [Arows,Acols] = A.size()
+    [Arows,Acols] = A.size
     V = zeros(Arows,Acols)
     for i in range(Acols):
         veci = A[:,i]
@@ -35,9 +35,9 @@ def MGS_qr(A:Matrix):
 
 def householder(x:Vector):
     alpha = x[0]
+    #print(alpha)
     s = norm(Vector(x[1:]))**2
     v = copy(x)
-
     if s == 0:
         tau = 0
     else:
@@ -53,14 +53,13 @@ def householder(x:Vector):
 def qr_householder(A:Matrix):
     # qr method applied through householder reflections
 
-    [m,n] = A.size() # m = Arows and n = Acols, to avoid rewriting a lot
+    [m,n] = A.size # m = Arows and n = Acols, to avoid rewriting a lot
     ending = n-1
     if m != n:
         ending = n
     if m<n:
         print("Matrix cannot be QR decomposed")
         sys.exit()
-    
 
     R = copy(A)
     Q = eye(m)

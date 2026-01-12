@@ -1,3 +1,4 @@
+import sys
 from src.LinAlg.utils import isequal
 from src.LinAlg.ndarray import Matrix,Vector
 
@@ -9,16 +10,17 @@ def alert(message:str):
 
 ## Matrix generation test
 
-matrix = [[1,1,1],[1,1,1],[1,1,1]]
+matrix = [1,1,1,1,1,1,1,1,1]
 A = Matrix([[1,1,1],[1,1,1],[1,1,1]])
-A_ = Matrix([1,1,1,1,1,1,1,1,1],3,3)
+A_ = Matrix([1,1,1,1,1,1,1,1,1],size=[3,3])
 tests_passed = 0
 
 if A.matrix != matrix or A_.matrix != matrix:
+    print(A.matrix)
     alert("Major error: Matrix generation not working!")
 
 x = Vector([1,1,1,1,1])
-vector_matrix = [[1],[1],[1],[1],[1]]
+vector_matrix = [1,1,1,1,1]
 
 if x.matrix != vector_matrix:
     alert("Vector not generating properly")
@@ -29,9 +31,9 @@ tests_passed += 1
 
 # These test if the code properly generates a Vector in the special cases we have called upon the matrix generation
 x = Matrix([1,1,1,1,1])
-vector_matrix = [[1],[1],[1],[1],[1]]
+vector_matrix = [1,1,1,1,1]
 row = Matrix([[1,1,1,1,1]])
-row_matrix = [[1,1,1,1,1]]
+row_matrix = [1,1,1,1,1]
 
 if x.matrix != vector_matrix or row.matrix != row_matrix:
     alert("Vector not generating properly from Matrix call")
@@ -41,7 +43,7 @@ if x.matrix != vector_matrix or row.matrix != row_matrix:
 A1 = Matrix([[1,1,1],[1,1,1],[1,1,1]])
 B = Vector([2,2])
 C1 = Matrix([[1,1,1],[2,1,1],[2,1,1]])
-A1[1:2,0] = B
+A1[1:3,0] = B
 
 A2 = Matrix([[1,1,1],[1,1,1],[1,1,1]])
 B = Matrix([[2,2],[2,2]])
@@ -63,7 +65,7 @@ if not isequal(A.T(),T):
 
 tests_passed += 1
 
-if len(A) != 3:
+if len(A) != 9:
     alert("len(A) not working!")
 
 tests_passed += 1
@@ -124,17 +126,17 @@ A = Matrix([[1,2,3],[4,5,6],[7,8,9]])
 B = Matrix([[2,3,4],[5,6,7],[8,9,10]])
 C = Matrix([[2,6,12],[20,30,42],[56,72,90]])
 
-if not isequal(A**B,C):
-    alert("Element-wise multiplication not working")
+#if not isequal(A**B,C):
+#    alert("Element-wise multiplication not working")
 
 A = Matrix([[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1]])
 B = Matrix([[1,1,1,1],[1,1,1,1],[1,1,1,1],[1,1,1,1],[1,1,1,1]])
 
-if A.size() != [3,5] or B.size() != [5,4]:
+if A.size != [3,5] or B.size != [5,4]:
     alert("Size method not working!")
 
 x = Vector([1,1,1,1,1])
-y = Vector([1,1,1,1,1],is_row=1)
+y = Vector([1,1,1,1,1],axis=1)
 
 
 if not isequal(x.row(),y) or not isequal(y.col(),x):

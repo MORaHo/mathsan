@@ -15,7 +15,7 @@ def newton(x0:int,nmax:int,toll,f,df,mol:int):
     toll       Result Tollerance
     f df   Anonymus functions containing the function and it's derivative
     mol        When mol=1 the classical Newton method is used, otherwise permette the modified Newton algorithm will be used.
-    
+
     Exit Parameters:
     xvect      Vector containing all calcualted iterations, with the last being the final solution.
     it         Number of iterations completed
@@ -29,8 +29,7 @@ def newton(x0:int,nmax:int,toll,f,df,mol:int):
     while it < nmax and err > toll:
         dfx = df(xv)
         if dfx == 0:
-            print('Stop due to annulment of df')
-            sys.exit()
+            raise Exception('Stop due to annulment of df')
         xn = xv - mol*f(xv)/dfx
         err = abs(xn-xv)
         xvect.append(xn)

@@ -5,16 +5,15 @@ from src.LinAlg.ndarray import ndarray,Matrix,Vector
 ## This is an equivalent to .* in matlab, and I have called ew for element-wise multiplication, and since the solution is ugly it makes it easier to remember the name
 
 def ew(x:ndarray,y:ndarray):
-    if x.size() != y.size():
+    if x.size != y.size:
         print("Matrices are not the same size")
         sys.exit()
-    [rows,cols] = x.size()
+    [rows,cols] = x.size
     M = []
     for j in range(rows):
         for i in range(cols):
-            M.append(x[j][i]*y[j][i])
-    if type(x) == Vector:
-        return Vector(M,is_row=cols>1)
+            M.append(x[j,i]*y[j,i])
+    if type(x) is Vector:
+        return Vector(M,axis=int(cols>1))
     else:
-        return Matrix(M,rows,cols)
-
+        return Matrix(M,size=x.size)

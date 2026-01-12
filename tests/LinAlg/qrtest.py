@@ -8,3 +8,5 @@ A = Matrix([[12,-51,4],[6,167,-68],[-4,24,-41]])
 
 if not isequal(A,Q*R):
     print("Householder-rotation-based QR decomposition not working")
+
+print("QR test passed!")

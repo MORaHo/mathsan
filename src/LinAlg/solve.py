@@ -9,16 +9,16 @@ from src.LinAlg.ndarray import Matrix,Vector
 from src.LinAlg.utils import zeros, tril, triu,diag, isequal
 
 def forward_substitution(L:Matrix,b:Vector):
-    
+
     b = b.col()
     y = []
-    y.append(b[0]/L[0][0])
+    y.append(b[0]/L[0,0])
 
     for j in range(1,len(b)):
         b_j = b[j]
         for i in range(j):
-            b_j -= L[j][i]*y[i]
-        y.append(b_j/L[j][j])
+            b_j -= L[j,i]*y[i]
+        y.append(b_j/L[j,j])
     return Vector(y)
 
 fwd_sub = forward_substitution
@@ -27,29 +27,29 @@ def backward_substitution(U:Matrix,y:Vector):
     y = y.col()
     n = len(y)-1
     x = zeros(n+1,1)
-    x[n] = y[-1]/U[-1][-1]
-    
+    [rows,cols] = U.size
+    x[n] = y[-1]/U[rows-1,cols-1]
+
     for j in range(n-1,-1,-1):
         y_j = y[j]
         for i in range(n,j,-1):
-            y_j -= U[j][i]*x[i]
-        x[j] = y_j/U[j][j]
+            y_j -= U[j,i]*x[i]
+        x[j] = y_j/U[j,j]
     return x
 
 bkw_sub = backward_substitution
 
 def solve(A:Matrix,b:Vector):
-    
-    [m,n] = A.size()
+
+    [m,n] = A.size
     if m < n:
-        print('System cannot be solved')
-        sys.exit()
+        raise('System cannot be solved, more unknowns than variables!')
 
     if m == n and det(A) == 0:
         print("Solution may not be unique!")
 
     #this will be expanded to handle more and more cases, initially I intend to add a QR solver and in the end for this function to basically become the \ of matlab
-    
+
     # Following diagram in the algorithm section of https://uk.mathworks.com/help/matlab/ref/double.mldivide.html
 
     if m != n:

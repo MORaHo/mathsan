@@ -1,3 +1,6 @@
+from src.LinAlg.ndarray import ROW_MAJOR,COLUMN_MAJOR
+
+"""
 from src.LinAlg.chol import chol
 from src.LinAlg.cond import cond
 from src.LinAlg.det import det
@@ -18,3 +21,4 @@ from src.LinAlg.spd import spd
 from src.LinAlg.thomas import thomas
 from src.LinAlg.utils import zeros,ones,eye,copy,diag,tril,triu,linspace,isequal
 from src.LinAlg.vand import vand
+"""

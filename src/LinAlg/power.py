@@ -4,7 +4,7 @@ from src.LinAlg.inv import inv
 from math import sqrt
 
 toll = 2e-16 #tolerance we'll be using for power methods
-nmax = 250 #maximum number of iterations 
+nmax = 250 #maximum number of iterations
 
 def norm(v:Vector):
     norm = 0
@@ -15,8 +15,8 @@ def norm(v:Vector):
 
 def maxeig(A:Matrix):
     ## Implementation of the power method, used to find the largest eigenvalue
-    
-    [Arows,_] = A.size()
+
+    [Arows,_] = A.size
     x = ones(Arows) # initial guess
     y = x/norm(x)
     iter = 0
@@ -24,7 +24,7 @@ def maxeig(A:Matrix):
     lambda_ = y.H() * A * y # eventhough its a 1x1 matrix it's still a matrix so to get the value it needs to be extracted
 
     while iter < nmax and rel_err > toll:
-            
+
         x = A * y
         y = x/norm(x)
         old_lambda = lambda_

@@ -17,30 +17,3 @@ for k in range(a,n):
 
 decimal.getcontext().prec = 20
 PI = float((dD(426880)*dD(10005).sqrt())/(dD(13591409)+dD(s)))
-print(PI)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

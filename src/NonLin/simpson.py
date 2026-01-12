@@ -1,8 +1,8 @@
-from src.Misc.linspace import linspace
+from src.misc.linspace import linspace
 from src.LinAlg.ndarray import Vector
 
 def simpson(a,b,N,f):
-    
+
     h = (b-a)/N
     x = linspace(a,b,2*N+1)
     y = f(x)

@@ -1,6 +1,7 @@
-from src.LinAlg import eye,Vector,isequal
+from src.LinAlg.utils import eye,isequal
+from src.LinAlg.ndarray import Vector
 from src.NonLin.broyden import broyden
-from src.Maths import sin
+from src.maths.sin import sin
 from math import pi
 
 B0 = eye(2)

@@ -3,34 +3,38 @@ from typing import Union
 from src.LinAlg.ndarray import Matrix, Vector, ndarray
 from src.LinAlg.power import inv_power, power
 from src.LinAlg.utils import copy
+from src.LinAlg import ROW_MAJOR
 
 numbers = Union[int, float, complex]
 
 def norm(M: ndarray, type_=2) -> numbers:  # this will be changes to 2 when the spectral norm is implemented
-    A = copy(M)
-    [Arows, Acols] = A.size()
 
-    if type(M) == Vector:
+    A = copy(M)
+    [Arows, Acols] = A.size
+
+    if type(M) is Vector:
         match type_:
-            case 1:
-                norm = 0
-                for i in range(Acols):
-                    sum = 0
-                    for j in range(Arows):
-                        sum += abs(A.matrix[j][i])
-                    if sum > norm:
-                        norm = sum
-                return norm
+            case 1: #largest sum of elements in each column
+                if M.major != ROW_MAJOR:
+                    return M.sum()
+                else:
+                    norm = 0
+                    for i in range(len(A)):
+                        sum = abs(M[i])
+                        if sum > norm:
+                            norm = sum
+                    return norm
 
             case 100:  # infinity norm but I can used infinity
-                norm = 0
-                for j in range(Arows):
-                    sum = 0
-                    for i in range(Acols):
-                        sum += abs(A.matrix[j][i])
-                    if sum > norm:
-                        norm = sum
-                return norm
+                if M.major == ROW_MAJOR:
+                    return M.sum()
+                else:
+                    norm = 0
+                    for i in range(len(A)):
+                        sum = abs(M[i])
+                        if sum > norm:
+                            norm = sum
+                    return norm
 
             case 2:  # Eucledian, 2 will be reserved for what will be the spectral norm or there will be a distinction between vector and matrix normss
                 norm = 0
@@ -39,14 +43,14 @@ def norm(M: ndarray, type_=2) -> numbers:  # this will be changes to 2 when the 
 
                 return sqrt(norm)
 
-    elif type(M) == Matrix:
+    elif type(M) is Matrix:
         match type_:
             case 1:
                 norm = 0
                 for i in range(Acols):
                     sum = 0
                     for j in range(Arows):
-                        sum += abs(A[j][i])
+                        sum += abs(A[j,i])
                     if sum > norm:
                         norm = sum
                 return norm
@@ -56,7 +60,7 @@ def norm(M: ndarray, type_=2) -> numbers:  # this will be changes to 2 when the 
                 for j in range(Arows):
                     sum = 0
                     for i in range(Acols):
-                        sum += abs(A[j][i])
+                        sum += abs(A[j,i])
                     if sum > norm:
                         norm = sum
                 return norm
@@ -64,8 +68,8 @@ def norm(M: ndarray, type_=2) -> numbers:  # this will be changes to 2 when the 
             case 2:  # Eucledian, 2 will be reserved for what will be the spectral norm or there will be a distinction between vector and matrix normss
                 M1 = A * A.T()
                 M2 = A.T() * A
-                [M1rows, M1cols] = M1.size()
-                [M2rows, M2cols] = M2.size()
+                [M1rows, M1cols] = M1.size
+                [M2rows, M2cols] = M2.size
                 if M1rows * M1cols > M2rows * M2cols:
                     M = A.T() * A
                 else:

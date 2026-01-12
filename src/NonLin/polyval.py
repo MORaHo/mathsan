@@ -9,7 +9,7 @@ def polyval(p:Vector,xeval:Vector):
     xeval = zeros(x)
     for i in range(x):
         for j in range(n):
-            xeval[i][0] += p[n-j-1] * xinit[i]**j
+            xeval[i,0] += p[n-j-1] * xinit[i]**j
 
     return xeval
 

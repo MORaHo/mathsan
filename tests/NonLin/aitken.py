@@ -1,6 +1,6 @@
 from src.NonLin.aitken import aitken
-from src.LinAlg.utils import isequal
-from src.Maths import log,exp
+from src.maths.log import log
+from src.maths.exp import exp
 
 EPS = 1E-8
 
